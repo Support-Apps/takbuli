@@ -15,12 +15,17 @@
       --secondary-text: #666666;
       --accent-pink: #f8ecee;
       --accent-pink-dark: #e8c5c8;
-      --pink-button: #d8a8b0;
-      --pink-button-hover: #c4949c;
-      --gold-primary: #d4af37;
-      --gold-hover: #b89628;
-      --green-success: #25d366;
-      --green-hover: #1ebc57;
+      
+      /* פלטת כפתורים חדשה, רכה ומתואמת */
+      --btn-whatsapp-bg: #38a169;
+      --btn-whatsapp-hover: #2f855a;
+      
+      --btn-mail-bg: #d4af37;
+      --btn-mail-hover: #b89628;
+      
+      --btn-print-bg: #c997a0;
+      --btn-print-hover: #b5838d;
+
       --border-color: #f0e6df;
       --shadow-subtle: 0 10px 30px rgba(212, 175, 55, 0.08);
       --radius: 16px;
@@ -118,7 +123,7 @@
 
     input:focus, select:focus {
       outline: none;
-      border-color: var(--gold-primary);
+      border-color: var(--btn-mail-bg);
       background-color: #fff;
       box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
     }
@@ -129,11 +134,29 @@
       gap: 12px;
     }
 
+    /* API Settings Box */
+    .api-settings-box {
+      background: #faf6f0;
+      border: 1px dashed var(--btn-mail-bg);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .api-settings-box h4 {
+      font-size: 0.95rem;
+      color: #333;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Receipt Live Preview Box */
     .receipt-preview {
       background: #fff;
       border: 1px solid var(--border-color);
-      border-top: 5px solid var(--gold-primary);
+      border-top: 5px solid var(--btn-mail-bg);
       border-radius: var(--radius);
       padding: 24px;
       position: relative;
@@ -224,33 +247,33 @@
     }
 
     .btn-whatsapp {
-      background-color: var(--green-success);
+      background-color: var(--btn-whatsapp-bg);
       color: white;
+      box-shadow: 0 4px 12px rgba(56, 161, 105, 0.2);
     }
 
     .btn-whatsapp:hover {
-      background-color: var(--green-hover);
+      background-color: var(--btn-whatsapp-hover);
     }
 
     .btn-mail {
-      background-color: var(--gold-primary);
+      background-color: var(--btn-mail-bg);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
     }
 
     .btn-mail:hover {
-      background-color: var(--gold-hover);
+      background-color: var(--btn-mail-hover);
     }
 
-    /* Updated Print/PDF Button Color */
     .btn-print {
-      background-color: var(--pink-button);
-      color: #4a2e35;
-      box-shadow: 0 4px 12px rgba(216, 168, 176, 0.3);
+      background-color: var(--btn-print-bg);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(201, 151, 160, 0.2);
     }
 
     .btn-print:hover {
-      background-color: var(--pink-button-hover);
+      background-color: var(--btn-print-hover);
     }
 
     .history-card {
@@ -284,7 +307,7 @@
     }
 
     @media print {
-      .bsd, .card, .actions, .history-card, .header-title {
+      .bsd, .card, .actions, .history-card, .header-title, .api-settings-box {
         display: none !important;
       }
       .receipt-preview {
@@ -306,6 +329,23 @@
     <div class="header-title">
       <h1>תַּקְבּוּלִי</h1>
       <p>מערכת עצמאית לשליחת קבלות ממוחשבות למונית</p>
+    </div>
+
+    <!-- API Settings Panel -->
+    <div class="api-settings-box">
+      <h4>⚙️ הגדרות API (iCount או Morning)</h4>
+      <div class="form-group" style="margin-bottom: 8px;">
+        <select id="apiProvider" onchange="toggleApiFields()" style="font-size:0.85rem; padding:8px;">
+          <option value="icount">iCount API</option>
+          <option value="morning">Morning (חשבונית ירוקה) API</option>
+        </select>
+      </div>
+      <div class="row-2" style="margin-bottom: 8px;">
+        <input type="text" id="apiKey" placeholder="מפתח API / Secret" style="font-size:0.85rem; padding:8px;">
+        <input type="text" id="apiExtra" placeholder="מזהה חברה / Company ID / User" style="font-size:0.85rem; padding:8px;">
+      </div>
+      <button type="button" onclick="saveApiSettings()" style="background:#444; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer;">שמור הגדרות API</button>
+      <span id="apiStatus" style="font-size:0.75rem; color:#2b5e3b; margin-right:8px; font-weight:600;"></span>
     </div>
 
     <form id="receiptForm">
@@ -454,15 +494,59 @@
   let currentNum = parseInt(localStorage.getItem('lastReceiptNum') || '1001');
   let history = JSON.parse(localStorage.getItem('receiptHistory') || '[]');
 
-  function updateDate() {
-    const now = new Date();
-    return now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
-  }
-
   function init() {
     document.getElementById('receiptNum').value = '#' + currentNum;
     document.getElementById('viewDate').innerText = updateDate();
+    
+    const savedProvider = localStorage.getItem('tax_api_provider') || 'icount';
+    const savedApiKey = localStorage.getItem('tax_api_key') || '';
+    const savedApiExtra = localStorage.getItem('tax_api_extra') || '';
+
+    document.getElementById('apiProvider').value = savedProvider;
+    document.getElementById('apiKey').value = savedApiKey;
+    document.getElementById('apiExtra').value = savedApiExtra;
+    
+    toggleApiFields();
+    if(savedApiKey) document.getElementById('apiStatus').innerText = '✓ מוגדר';
+
     renderHistory();
+  }
+
+  function toggleApiFields() {
+    const provider = document.getElementById('apiProvider').value;
+    const extraInput = document.getElementById('apiExtra');
+    if(provider === 'icount') {
+      extraInput.placeholder = 'מזהה חברה (Company ID)';
+    } else {
+      extraInput.placeholder = 'מפתח משתמש / Workspace ID';
+    }
+  }
+
+  function saveApiSettings() {
+    const provider = document.getElementById('apiProvider').value;
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const apiExtra = document.getElementById('apiExtra').value.trim();
+
+    localStorage.setItem('tax_api_provider', provider);
+    localStorage.setItem('tax_api_key', apiKey);
+    localStorage.setItem('tax_api_extra', apiExtra);
+
+    document.getElementById('apiStatus').innerText = '✓ נשמר בהצלחה!';
+    setTimeout(() => {
+      document.getElementById('apiStatus').innerText = apiKey ? '✓ מוגדר' : '';
+    }, 3000);
+  }
+
+  async function issueTaxDocument(documentData) {
+    const apiKey = localStorage.getItem('tax_api_key');
+    if(!apiKey) return { success: false };
+    // כאן תתבצע קריאת ה-API למערכת המורשית בהתאם למפתחות שלך
+    return { success: true };
+  }
+
+  function updateDate() {
+    const now = new Date();
+    return now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
   }
 
   function updatePreview() {
@@ -489,7 +573,9 @@
   }
 
   document.querySelectorAll('input, select').forEach(elem => {
-    elem.addEventListener('input', updatePreview);
+    if(!elem.id.includes('api')) {
+      elem.addEventListener('input', updatePreview);
+    }
   });
 
   function saveToHistory(amount, passenger, payment) {
@@ -555,15 +641,29 @@
     return encodeURIComponent(text);
   }
 
-  function sendWhatsApp() {
+  async function sendWhatsApp() {
     const phoneInput = document.getElementById('passengerPhone').value.replace(/\D/g, '');
     const amount = document.getElementById('amount').value;
+    const passengerName = document.getElementById('passengerName').value;
+    const passengerMail = document.getElementById('passengerMail').value;
+    const pickup = document.getElementById('pickup').value;
+    const dropoff = document.getElementById('dropoff').value;
+
     if(!amount) {
       alert('נא להזין סכום נסיעה');
       return;
     }
 
-    saveToHistory(amount, document.getElementById('passengerName').value, document.getElementById('paymentMethod').value);
+    await issueTaxDocument({
+      passenger: passengerName || 'כללי',
+      phone: phoneInput,
+      email: passengerMail,
+      amount: parseFloat(amount),
+      pickup: pickup || 'מוצא',
+      dropoff: dropoff || 'יעד'
+    });
+
+    saveToHistory(amount, passengerName, document.getElementById('paymentMethod').value);
 
     let cleanPhone = phoneInput;
     if(cleanPhone.startsWith('0')) {
@@ -578,22 +678,36 @@
     window.open(url, '_blank');
   }
 
-  function sendEmail() {
+  async function sendEmail() {
     const mail = document.getElementById('passengerMail').value;
     const amount = document.getElementById('amount').value;
+    const passengerName = document.getElementById('passengerName').value;
+    const phoneInput = document.getElementById('passengerPhone').value;
+    const pickup = document.getElementById('pickup').value;
+    const dropoff = document.getElementById('dropoff').value;
+
     if(!amount) {
       alert('נא להזין סכום נסיעה');
       return;
     }
 
-    saveToHistory(amount, document.getElementById('passengerName').value, document.getElementById('paymentMethod').value);
+    await issueTaxDocument({
+      passenger: passengerName || 'כללי',
+      phone: phoneInput,
+      email: mail,
+      amount: parseFloat(amount),
+      pickup: pickup || 'מוצא',
+      dropoff: dropoff || 'יעד'
+    });
+
+    saveToHistory(amount, passengerName, document.getElementById('paymentMethod').value);
 
     const subject = encodeURIComponent(`קבלה ממוחשבת עבור נסיעה במונית (תַּקְבּוּלִי) - #${currentNum}`);
     const body = formatMessage();
     window.open(`mailto:${mail}?subject=${subject}&body=${body}`, '_blank');
   }
 
-  init();
+    init();
 </script>
 </body>
 </html>
