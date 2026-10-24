@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תַּקְבּוּלִי - קבלה דיגיטלית למונית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #faf8f5;
+      --card-bg: #ffffff;
+      --primary-text: #2c2c2c;
+      --secondary-text: #666666;
+      --accent-pink: #f8ecee;
+      --accent-pink-dark: #e8c5c8;
+      --gold-primary: #d4af37;
+      --gold-hover: #b89628;
+      --green-success: #25d366;
+      --green-hover: #1ebc57;
+      --border-color: #f0e6df;
+      --shadow-subtle: 0 10px 30px rgba(212, 175, 55, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Assistant', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--primary-text);
+      min-height: 100vh;
+      padding: 20px 12px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .bsd {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #888888;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 15px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .header-title {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 2rem;
+      color: #111;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .header-title p {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background-color: #fcfcfc;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--gold-primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Receipt Live Preview Box */
+    .receipt-preview {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-top: 5px solid var(--gold-primary);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .receipt-header {
+      text-align: center;
+      border-bottom: 1px dashed var(--accent-pink-dark);
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+
+    .receipt-header h2 {
+      font-size: 1.3rem;
+      color: #222;
+      font-weight: 700;
+    }
+
+    .receipt-badge {
+      display: inline-block;
+      background: var(--accent-pink);
+      color: #8a4a53;
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .receipt-details {
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #f9f9f9;
+      padding-bottom: 4px;
+    }
+
+    .receipt-row .label {
+      color: var(--secondary-text);
+    }
+
+    .receipt-row .value {
+      font-weight: 600;
+      color: #111;
+    }
+
+    .receipt-total {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 2px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-amount {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2b5e3b;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-whatsapp {
+      background-color: var(--green-success);
+      color: white;
+    }
+
+    .btn-whatsapp:hover {
+      background-color: var(--green-hover);
+    }
+
+    /* Updated Mail Button with prominent Gold aesthetic */
+    .btn-mail {
+      background-color: var(--gold-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-mail:hover {
+      background-color: var(--gold-hover);
+    }
+
+    .btn-print {
+      background-color: #333333;
+      color: white;
+    }
+
+    .btn-print:hover {
+      background-color: #111111;
+    }
+
+    .history-card {
+      grid-column: 1 / -1;
+      margin-top: 10px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .history-table th, .history-table td {
+      padding: 10px;
+      text-align: right;
+      border-bottom: 1px solid #eee;
+    }
+
+    .history-table th {
+      background-color: var(--bg-cream);
+      color: var(--secondary-text);
+      font-weight: 600;
+    }
+
+    @media print {
+      .bsd, .card, .actions, .history-card, .header-title {
+        display: none !important;
+      }
+      .receipt-preview {
+        border: none;
+        box-shadow: none;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bsd">בס"ד</div>
+
+<div class="container">
+  
+  <!-- Form Section -->
+  <div class="card">
+    <div class="header-title">
+      <h1>תַּקְבּוּלִי</h1>
+      <p>מערכת עצמאית לשליחת קבלות ממוחשבות למונית</p>
+    </div>
+
+    <form id="receiptForm">
+      <div class="row-2">
+        <div class="form-group">
+          <label for="receiptNum">מס' קבלה</label>
+          <input type="text" id="receiptNum" readonly>
+        </div>
+        <div class="form-group">
+          <label for="driverName">שם הנהג/ת</label>
+          <input type="text" id="driverName" value="נחום שוחט">
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="form-group">
+          <label for="taxiNum">מס' מונית / רישיון</label>
+          <input type="text" id="taxiNum" value="12345">
+        </div>
+        <div class="form-group">
+          <label for="paymentMethod">אמצעי תשלום</label>
+          <select id="paymentMethod">
+            <option value="מזומן">מזומן</option>
+            <option value="כרטיס אשראי">כרטיס אשראי</option>
+            <option value="Bit">Bit</option>
+            <option value="PayBox">PayBox</option>
+            <option value="העברה בנקאית">העברה בנקאית</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="passengerName">שם הנוסע/ת (אופציונלי)</label>
+        <input type="text" id="passengerName" placeholder="ישראל ישראלי">
+      </div>
+
+      <div class="row-2">
+        <div class="form-group">
+          <label for="passengerPhone">טלפון נייד (ל-WhatsApp)</label>
+          <input type="tel" id="passengerPhone" placeholder="0500000000">
+        </div>
+        <div class="form-group">
+          <label for="passengerMail">דוא"ל הנוסע</label>
+          <input type="email" id="passengerMail" placeholder="mail@example.com">
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="form-group">
+          <label for="pickup">מוצא</label>
+          <input type="text" id="pickup" placeholder="ירושלים">
+        </div>
+        <div class="form-group">
+          <label for="dropoff">יעד</label>
+          <input type="text" id="dropoff" placeholder="תל אביב">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">סכום כולל (₪)</label>
+        <input type="number" id="amount" placeholder="0.00" required step="0.1">
+      </div>
+    </form>
+  </div>
+
+  <!-- Live Preview & Actions -->
+  <div>
+    <div class="receipt-preview" id="receiptContent">
+      <div class="receipt-header">
+        <h2 id="viewDriver">מונית - נחום שוחט</h2>
+        <span class="receipt-badge">תַּקְבּוּלִי • אישור תשלום ממוחשב</span>
+      </div>
+
+      <div class="receipt-details">
+        <div class="receipt-row">
+          <span class="label">מספר קבלה:</span>
+          <span class="value" id="viewNum">#1001</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">תאריך ושעה:</span>
+          <span class="value" id="viewDate">--/--/----</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">מספר מונית:</span>
+          <span class="value" id="viewTaxi">12345</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">שם הנוסע:</span>
+          <span class="value" id="viewPassenger">כללי</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">מסלול:</span>
+          <span class="value" id="viewRoute">---</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">אופן התשלום:</span>
+          <span class="value" id="viewPayment">מזומן</span>
+        </div>
+
+        <div class="receipt-total">
+          <span>סה"כ שולם:</span>
+          <span class="total-amount" id="viewAmount">₪0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-whatsapp" onclick="sendWhatsApp()">
+        💬 שליחה ב-WhatsApp
+      </button>
+      <button class="btn btn-mail" onclick="sendEmail()">
+        ✉️ שליחה במייל
+      </button>
+      <button class="btn btn-print" onclick="window.print()">
+        🖨️ הדפסה / שמירה כ-PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- History Log -->
+  <div class="card history-card">
+    <div class="history-header">
+      <h3>היסטוריית נסיעות</h3>
+      <span id="dailyTotal" style="font-weight:700; color:#2b5e3b;">סה"כ שנרשם: ₪0</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>תאריך</th>
+            <th>נוסע</th>
+            <th>סכום</th>
+            <th>תשלום</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentNum = parseInt(localStorage.getItem('lastReceiptNum') || '1001');
+  let history = JSON.parse(localStorage.getItem('receiptHistory') || '[]');
+
+  function updateDate() {
+    const now = new Date();
+    return now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
+  }
+
+  function init() {
+    document.getElementById('receiptNum').value = '#' + currentNum;
+    document.getElementById('viewDate').innerText = updateDate();
+    renderHistory();
+  }
+
+  function updatePreview() {
+    const driver = document.getElementById('driverName').value || 'נהג מונית';
+    const taxi = document.getElementById('taxiNum').value || '-';
+    const passenger = document.getElementById('passengerName').value || 'כללי';
+    const pickup = document.getElementById('pickup').value;
+    const dropoff = document.getElementById('dropoff').value;
+    const amount = document.getElementById('amount').value || '0';
+    const payment = document.getElementById('paymentMethod').value;
+
+    document.getElementById('viewDriver').innerText = 'מונית - ' + driver;
+    document.getElementById('viewNum').innerText = '#' + currentNum;
+    document.getElementById('viewTaxi').innerText = taxi;
+    document.getElementById('viewPassenger').innerText = passenger;
+    document.getElementById('viewPayment').innerText = payment;
+    document.getElementById('viewAmount').innerText = '₪' + amount;
+
+    let routeText = '-';
+    if(pickup || dropoff) {
+      routeText = (pickup || '...') + ' ➔ ' + (dropoff || '...');
+    }
+    document.getElementById('viewRoute').innerText = routeText;
+  }
+
+  document.querySelectorAll('input, select').forEach(elem => {
+    elem.addEventListener('input', updatePreview);
+  });
+
+  function saveToHistory(amount, passenger, payment) {
+    const item = {
+      num: currentNum,
+      date: new Date().toLocaleDateString('he-IL'),
+      passenger: passenger || 'כללי',
+      amount: parseFloat(amount) || 0,
+      payment: payment
+    };
+    history.unshift(item);
+    localStorage.setItem('receiptHistory', JSON.stringify(history));
+    currentNum++;
+    localStorage.setItem('lastReceiptNum', currentNum.toString());
+    document.getElementById('receiptNum').value = '#' + currentNum;
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const tbody = document.getElementById('historyBody');
+    tbody.innerHTML = '';
+    let total = 0;
+
+    history.slice(0, 10).forEach(item => {
+      total += item.amount;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>#${item.num}</td>
+        <td>${item.date}</td>
+        <td>${item.passenger}</td>
+        <td>₪${item.amount}</td>
+        <td>${item.payment}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('dailyTotal').innerText = 'סה"כ שנרשם: ₪' + total.toFixed(1);
+  }
+
+  function formatMessage() {
+    const driver = document.getElementById('driverName').value;
+    const taxi = document.getElementById('taxiNum').value;
+    const passenger = document.getElementById('passengerName').value || 'נוסע/ת';
+    const pickup = document.getElementById('pickup').value;
+    const dropoff = document.getElementById('dropoff').value;
+    const amount = document.getElementById('amount').value;
+    const payment = document.getElementById('paymentMethod').value;
+    const dateStr = updateDate();
+
+    let text = `🚕 *תַּקְבּוּלִי • קבלה / אישור תשלום ממוחשב*\n`;
+    text += `---------------------------------\n`;
+    text += `👤 *נהג:* ${driver}\n`;
+    text += `🚕 *מס' מונית:* ${taxi}\n`;
+    text += `🧾 *מס' קבלה:* #${currentNum}\n`;
+    text += `📅 *תאריך ושעה:* ${dateStr}\n`;
+    if(passenger !== 'נוסע/ת') text += `🙋‍♂️ *לכבוד:* ${passenger}\n`;
+    if(pickup || dropoff) text += `📍 *מסלול:* ${pickup} ➔ ${dropoff}\n`;
+    text += `💳 *אופן תשלום:* ${payment}\n`;
+    text += `💰 *סה"כ שולם:* ₪${amount}\n`;
+    text += `---------------------------------\n`;
+    text += `תודה רבה ונסיעה טובה! 🙏`;
+
+    return encodeURIComponent(text);
+  }
+
+  function sendWhatsApp() {
+    const phoneInput = document.getElementById('passengerPhone').value.replace(/\D/g, '');
+    const amount = document.getElementById('amount').value;
+    if(!amount) {
+      alert('נא להזין סכום נסיעה');
+      return;
+    }
+
+    saveToHistory(amount, document.getElementById('passengerName').value, document.getElementById('paymentMethod').value);
+
+    let cleanPhone = phoneInput;
+    if(cleanPhone.startsWith('0')) {
+      cleanPhone = '972' + cleanPhone.substring(1);
+    }
+
+    const text = formatMessage();
+    let url = `https://wa.me/${cleanPhone}?text=${text}`;
+    if(!cleanPhone) {
+      url = `https://wa.me/?text=${text}`;
+    }
+    window.open(url, '_blank');
+  }
+
+  function sendEmail() {
+    const mail = document.getElementById('passengerMail').value;
+    const amount = document.getElementById('amount').value;
+    if(!amount) {
+      alert('נא להזין סכום נסיעה');
+      return;
+    }
+
+    saveToHistory(amount, document.getElementById('passengerName').value, document.getElementById('paymentMethod').value);
+
+    const subject = encodeURIComponent(`קבלה ממוחשבת עבור נסיעה במונית (תַּקְבּוּלִי) - #${currentNum}`);
+    const body = formatMessage();
+    window.open(`mailto:${mail}?subject=${subject}&body=${body}`, '_blank');
+  }
+
+  init();
+</script>
+</body>
+</html>
