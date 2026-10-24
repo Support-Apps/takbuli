@@ -15,6 +15,8 @@
       --secondary-text: #666666;
       --accent-pink: #f8ecee;
       --accent-pink-dark: #e8c5c8;
+      --pink-button: #d8a8b0;
+      --pink-button-hover: #c4949c;
       --gold-primary: #d4af37;
       --gold-hover: #b89628;
       --green-success: #25d366;
@@ -230,7 +232,6 @@
       background-color: var(--green-hover);
     }
 
-    /* Updated Mail Button with prominent Gold aesthetic */
     .btn-mail {
       background-color: var(--gold-primary);
       color: #ffffff;
@@ -241,13 +242,15 @@
       background-color: var(--gold-hover);
     }
 
+    /* Updated Print/PDF Button Color */
     .btn-print {
-      background-color: #333333;
-      color: white;
+      background-color: var(--pink-button);
+      color: #4a2e35;
+      box-shadow: 0 4px 12px rgba(216, 168, 176, 0.3);
     }
 
     .btn-print:hover {
-      background-color: #111111;
+      background-color: var(--pink-button-hover);
     }
 
     .history-card {
